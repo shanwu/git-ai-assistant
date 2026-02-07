@@ -13,6 +13,48 @@ This tool automatically writes clear, detailed Pull Request descriptions and com
 
 ---
 
+## 🧩 How it Works
+
+### Installation Architecture
+When you run `install.sh`, it sets up the necessary components in your repository:
+
+```mermaid
+graph TD
+    User([User]) -->|Runs| Installer[install.sh]
+    Installer -->|1. Setup| Scripts["Scripts & Template"]
+    Installer -->|2. Installs| Hook[".git/hooks/prepare-commit-msg"]
+    Installer -->|3. Sets| Config["git config core.editor=true"]
+    
+    subgraph TargetRepo [Your Repository]
+        Scripts
+        Hook
+        Config
+    end
+```
+
+### Execution Workflow
+This is what happens when you run `git commit`:
+
+```mermaid
+sequenceDiagram
+    participant Git
+    participant Hook as prepare-commit-msg
+    participant Script as Generate Script
+    participant Gemini as Gemini AI
+    
+    Note over Git: User runs 'git commit'
+    Git->>Hook: Triggers Hook
+    Hook->>Script: Executes
+    Script->>Git: git diff --cached
+    Git-->>Script: Returns changes
+    Script->>Gemini: Sends diff + prompt
+    Gemini-->>Script: Returns PR Description
+    Script-->>Hook: Populates commit message
+    Hook-->>Git: Returns control
+    Note over Git: Commit created automatically
+```
+
+
 ## 🛠️ Prerequisites (Do this first!)
 
 Before installing, make sure you have these two things:
