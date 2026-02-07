@@ -1,4 +1,4 @@
-<verb-led the best Pull Request summary subject>
+<verb-led the best Pull Request summary subject - The PR subject should NOT be in Markdown format>
 
 **PR Description:**
 ## Why
