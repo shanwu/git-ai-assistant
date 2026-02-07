@@ -1,0 +1,29 @@
+#!/bin/bash
+
+# $1 is the name of the file that contains the commit log message.
+COMMIT_MSG_FILE=$1
+COMMIT_SOURCE=$2
+SHA1=$3
+
+# Only run if the commit message is empty or a template
+if [ -z "$COMMIT_SOURCE" ] || [ "$COMMIT_SOURCE" = "template" ]; then
+    # Check if we have an API Key
+    if [ -n "$GEMINI_API_KEY" ]; then
+        echo "Generating PR description with Gemini..."
+        
+        # Run the generation script
+        # Assuming the script is in scripts/ relative to the repo root
+        REPO_ROOT=$(git rev-parse --show-toplevel)
+        GENERATED_MSG=$("$REPO_ROOT/scripts/generate_pr_description.sh")
+        
+        if [ $? -eq 0 ]; then
+            # Prepend the generated message to the commit message file
+            echo "$GENERATED_MSG" > "$COMMIT_MSG_FILE"
+            echo "PR description generated successfully."
+        else
+            echo "Failed to generate description. Proceeding with empty/template message."
+        fi
+    else
+        echo "GEMINI_API_KEY not set. Skipping PR description generation."
+    fi
+fi
